@@ -1,4 +1,5 @@
 {{- range $index, $service := .Values.services}}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,15 +24,15 @@ spec:
           env:
             {{- toYaml . | nindent 10 }}
           {{- end }}
-            - name: MONGODB_CONN_STR
+          {{- if .mongodb }}
+          - name: MONGODB_CONN_STR
             valueFrom:
               secretKeyRef:
                 name: {{ .mongodb.connectionStringSecret }}
                 key: connectionString.standard
-
+          {{- end }}
           ports:
-            - name: http
-              containerPort: {{ .service.port }}
+            - containerPort: {{ .service.port }}
               protocol: TCP
 
 ---
@@ -42,9 +43,13 @@ metadata:
   labels:
     app: {{ .nameOverride }}
 spec:
+  selector:
+    app: {{ .nameOverride }}
   ports:
     - port: {{ .service.port }}
       protocol: TCP
       targetPort: {{ .service.port }}
-      name: http
+  type: {{ .service.type }}
+---
+
 {{- end }}
