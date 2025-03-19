@@ -1,0 +1,44 @@
+{{- range $index, $service := .Values.services}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  {{ .nameOverride }}
+  labels:
+    app: {{ .nameOverride }}
+spec:
+  replicas: {{ .replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .nameOverride }}
+  template:
+    metadata:
+      labels:
+        app: {{ .nameOverride }}
+    spec:
+      containers:
+        - name: {{ .nameOverride }}
+          image: "{{ .image.name }}:{{ .image.tag }}"
+          imagePullPolicy: {{ .image.pullPolicy }}
+          {{- with .service.envs }}
+          env:
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .service.port }}
+              protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .nameOverride }}
+  labels:
+    app: {{ .nameOverride }}
+spec:
+  ports:
+    - port: {{ .service.port }}
+      protocol: TCP
+      targetPort: {{ .service.port }}
+      name: http
+{{- end }}
