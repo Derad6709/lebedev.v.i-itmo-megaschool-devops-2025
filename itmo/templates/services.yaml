@@ -23,6 +23,12 @@ spec:
           env:
             {{- toYaml . | nindent 10 }}
           {{- end }}
+            - name: MONGODB_CONN_STR
+            valueFrom:
+              secretKeyRef:
+                name: {{ .mongodb.connectionStringSecret }}
+                key: connectionString.standard
+
           ports:
             - name: http
               containerPort: {{ .service.port }}
