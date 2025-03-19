@@ -5,19 +5,10 @@
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
 
-MongoDB:
-  name: mongodb
-  service:
-    name:
-    port: 5555
-  image:
-    name: mongo
-    tag: 5.0.15
-    pullPolicy: IfNotPresent
-
 services:
   time-server:
-    connectionStringSecret: "example-mongodb-admin-my-user"
+    mongodb:
+      connectionStringSecret: "example-mongodb-admin-my-user"
     nameOverride: time-server
     service:
       port: 8000
@@ -28,12 +19,14 @@ services:
 
   auth-server:
     nameOverride: auth-server
-    connectionStringSecret: "example-mongodb-admin-my-user"
     service:
+      mongodb:
+        connectionStringSecret: "example-mongodb-admin-my-user"
       port: 8001
       envs:
         - name: TIMESERVER_URL
           value: "Hello from the environment"
+
     image:
       name: ifilyaninitmo/auth-server-mega-itmo
       tag: main
