@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: helm-check
+        uses: igabaydulin/helm-check-action@0.2.1
+        env:
+          CHART_LOCATION: ./itmo
